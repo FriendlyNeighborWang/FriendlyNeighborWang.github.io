@@ -1,0 +1,56 @@
+/* ============================================================================
+ * Blowfish 自定义配色方案 · Terminal Amber
+ * ============================================================================
+ * 灵感来源：panr/hugo-theme-terminal 的暖琥珀 + 暗棕配色
+ *   --background: #1a170f  (深暖棕)
+ *   --foreground: #eceae5  (米白)
+ *   --accent:     #eec35e  (芥末黄/琥珀)
+ *
+ * Blowfish 使用 Tailwind 的 50→900 阶段色板，每个值是 R, G, B（不带 rgb() 包装），
+ * 这样 Tailwind 能用 `rgb(var(--color-primary-500) / 0.5)` 加透明度。
+ *
+ * 色彩三族：
+ *   neutral   = 中性灰阶（背景、正文、边框）→ 暖调 stone 系
+ *   primary   = 主强调色（链接、按钮、活跃菜单）→ 琥珀 amber
+ *   secondary = 次强调色（标签、徽章）→ 柔化的琥珀（避免引入第三色制造噪声）
+ * ============================================================================ */
+:root {
+  /* Neutral · 暖石系（Warm Stone） */
+  /* Blowfish 在 dark mode 用 neutral-800 做 body 背景，所以这一档决定页面主底色。 */
+  /* 800 从 #2a241c 提亮到 #3a3326，整页背景不再压抑；900 保留较暗，专供 hero 黑半区使用。 */
+  --color-neutral: 255, 255, 255;
+  --color-neutral-50:  247, 246, 241;
+  --color-neutral-100: 235, 233, 222;
+  --color-neutral-200: 214, 210, 194;
+  --color-neutral-300: 184, 176, 157;
+  --color-neutral-400: 150, 139, 117;
+  --color-neutral-500: 117, 107,  88;
+  --color-neutral-600:  92,  82,  66;
+  --color-neutral-700:  72,  63,  50;
+  --color-neutral-800:  58,  51,  38;   /* = #3a3326, body 背景色（提亮） */
+  --color-neutral-900:  30,  26,  18;   /* = #1e1a12, hero 黑半区 */
+
+  /* Primary · 提亮琥珀芥末（Vivid Amber，比原 Terminal 更鲜，去 olive 感） */
+  --color-primary-50:  255, 251, 235;
+  --color-primary-100: 254, 243, 199;
+  --color-primary-200: 253, 230, 138;
+  --color-primary-300: 251, 218,  95;
+  --color-primary-400: 249, 211,  78;
+  --color-primary-500: 247, 201,  72;   /* = #f7c948, 鲜亮芥末黄（anchor） */
+  --color-primary-600: 217, 166,  46;
+  --color-primary-700: 175, 125,  20;
+  --color-primary-800: 130,  90,  10;
+  --color-primary-900:  75,  50,   5;
+
+  /* Secondary · 柔化琥珀（Muted Amber, 接近 ochre） */
+  --color-secondary-50:  248, 245, 235;
+  --color-secondary-100: 240, 232, 207;
+  --color-secondary-200: 226, 215, 174;
+  --color-secondary-300: 209, 192, 138;
+  --color-secondary-400: 192, 173, 110;
+  --color-secondary-500: 175, 155,  89;
+  --color-secondary-600: 154, 134,  71;
+  --color-secondary-700: 124, 106,  53;
+  --color-secondary-800:  92,  78,  39;
+  --color-secondary-900:  56,  47,  23;
+}

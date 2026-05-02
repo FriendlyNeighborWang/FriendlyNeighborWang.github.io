@@ -1,74 +1,54 @@
-# Hugo 站点配置 · PaperMod 主题
-# 完整变量参考: https://github.com/adityatelange/hugo-PaperMod/wiki/Variables
+# Hugo 站点配置 · Blowfish 主题
+# Blowfish 文档: https://blowfish.page/docs/configuration/
 #
-# 这个文件是你网站的"控制面板"。改动它通常需要 Ctrl+C 关掉 hugo server 再
-# 重启才能彻底生效（个别项 hugo server 会热加载，但 baseURL/theme 这种不会）。
+# 这一版只是把 Blowfish 默认效果跑起来；下一阶段（B++）才叠 Terminal 配色 +
+# Hugoplate 斜分割 hero。所以现在 colorScheme 仍是 blowfish 自带的默认值。
 
 # ============================================================================
 # 站点基础信息
 # ============================================================================
-baseURL: "https://friendlyneighborwang.github.io/"   # 上线后换成自定义域名（如 https://wangshihan.dev/）
-title: "Wang Sihan / 王思涵"                          # 浏览器标签 + 站点标题
-theme: "PaperMod"                                     # 用 themes/PaperMod 这个主题
-languageCode: "zh-CN"                                 # 影响 RSS / sitemap 的 lang 标签
-defaultContentLanguage: "zh"
+baseURL: "https://friendlyneighborwang.github.io/"
+defaultContentLanguage: "en"
+languageCode: "en"
+title: "Wang Sihan"
+theme: "blowfish"
 
 # ============================================================================
 # 构建行为
 # ============================================================================
-enableRobotsTXT: true        # 生成 robots.txt 让搜索引擎抓取
-buildDrafts: false           # 默认不输出 draft: true 的文章（写不完别让别人看到）
-buildFuture: false           # 不输出未来日期的文章
-buildExpired: false          # 不输出已过期的文章（front matter 有 expiryDate）
-enableEmoji: true            # MD 里写 :smile: 会被解析成 😄
-enableInlineShortcodes: true # 允许 {{< shortcode >}} 内联用法
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+enableInlineShortcodes: true
 
-# ============================================================================
-# 分页
-# ============================================================================
 pagination:
-  pagerSize: 10              # 列表页每页几篇文章
+  pagerSize: 10
 
-# ============================================================================
-# 压缩输出（部署时减少传输体积）
-# ============================================================================
 minify:
-  disableXML: true           # XML 压缩工具有时把 RSS 搞坏，先关
-  minifyOutput: true         # HTML/CSS/JS 仍会压缩
+  disableXML: true
+  minifyOutput: true
 
 # ============================================================================
-# 顶部导航菜单
+# 永久链接（让文章 URL 是 /posts/<slug> 形式，不带年月日，更清爽）
 # ============================================================================
-# weight 控制顺序（小的在左）。url 是 / 开头的站内绝对路径。
-# 任何菜单项要能跳过去，content/ 下必须有对应的 .md 文件或 section（比如 posts/）
-menu:
-  main:
-    - identifier: posts
-      name: 文章
-      url: /posts/
-      weight: 10
-    - identifier: archives
-      name: 归档
-      url: /archives/
-      weight: 20
-    - identifier: tags
-      name: 标签
-      url: /tags/
-      weight: 30
-    - identifier: search
-      name: 搜索
-      url: /search/
-      weight: 40
-    - identifier: about
-      name: 关于
-      url: /about/
-      weight: 50
+permalinks:
+  posts: "/posts/:slug/"
+  series: "/series/:slug/"
 
 # ============================================================================
-# 输出格式
+# Taxonomy（分类体系）
+# Blowfish 内置 series（系列文）的概念，比 PaperMod 多
 # ============================================================================
-# 主页除了 HTML 还输出 JSON——这是 PaperMod 客户端搜索（Fuse.js）所需的索引数据。
-# RSS 给订阅器用。
+taxonomies:
+  tag: tags
+  category: categories
+  series: series
+
+# ============================================================================
+# 输出格式（搜索功能要 JSON）
+# ============================================================================
 outputs:
   home:
     - HTML
@@ -76,126 +56,167 @@ outputs:
     - JSON
 
 # ============================================================================
-# Markdown 渲染设置
+# Markdown 渲染
 # ============================================================================
 markup:
   goldmark:
     renderer:
-      unsafe: true           # 允许 MD 里写裸 HTML（某些 shortcode 和 KaTeX 需要）
-  highlight:                 # 代码块高亮（用 Hugo 内置的 chroma 引擎）
-    noClasses: false         # 用 CSS 类而非 inline style，便于明暗主题切换
-    codeFences: true         # 支持 ```lang 这种围栏代码块
-    guessSyntax: true        # 没指定语言时自动猜
-    lineNos: false           # 默认不显示行号；个别文章想要可在 front matter 加
-    style: monokai           # 配色方案（chroma 内置约 80 种，可以换 dracula / github 等）
+      unsafe: true
+  highlight:
+    noClasses: false
+    codeFences: true
+    guessSyntax: true
+    lineNos: false
+    style: monokai
   tableOfContents:
-    startLevel: 2            # 目录从 ## 二级标题开始（一级 # 通常是文章标题本身）
-    endLevel: 4              # 到 #### 四级停
+    startLevel: 2
+    endLevel: 4
 
 # ============================================================================
-# PaperMod 主题参数（params 下的每一项都是 PaperMod 自己定义的）
+# 顶部导航菜单
+# ============================================================================
+# Blowfish 把 menu 配置和 hugo 标准位置一致；不需要单独 menus.toml
+# 我移除了"归档"——Blowfish 没有原生 archive 布局，/posts/ 卡片视图本身就是
+# 最直观的归档。如果以后真需要按年分组，再加。
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      pageRef: posts
+      weight: 10
+    - identifier: tags
+      name: Tags
+      pageRef: tags
+      weight: 20
+    - identifier: about
+      name: About
+      pageRef: about
+      weight: 30
+
+# ============================================================================
+# Blowfish 主题参数
 # ============================================================================
 params:
-  env: production            # production 启用一些性能优化和外部服务接入
-  description: "UE 引擎 / 图形 / 渲染 学习与工程笔记"
-  keywords: [Unreal Engine, Graphics, Rendering, Vulkan, C++]
-  author: "Wang Sihan"
+  # --- 主题外观 ---
+  colorScheme: "terminal-amber"  # 自定义方案，定义在 assets/css/schemes/terminal-amber.css
+  defaultAppearance: "dark"    # 仅 dark
+  autoSwitchAppearance: false  # 不跟随系统切换；右上角的明暗切换按钮也不显示
 
-  # --- 颜色与主题切换 ---
-  defaultTheme: auto         # auto 跟随系统 / light / dark
-  disableThemeToggle: false  # false = 显示右上角的明暗切换按钮
+  # --- 全局功能 ---
+  enableSearch: true           # 启用站内搜索（路由 /search/，主题自动生成）
+  enableCodeCopy: true         # 代码块右上角复制按钮
 
-  # --- 文章页功能开关（每一条都是单独的 UI 元素，可独立开关） ---
-  ShowReadingTime: true            # 显示预估阅读时间
-  ShowShareButtons: false          # 文末分享到推/FB 等按钮（个人技术博客用处不大）
-  ShowPostNavLinks: true           # 文末"上一篇 / 下一篇"
-  ShowBreadCrumbs: true            # 顶部"首页 › posts › 文章名"路径
-  ShowCodeCopyButtons: true        # 代码块右上角"复制"按钮
-  ShowToc: true                    # 文章右侧目录
-  TocOpen: false                   # 目录默认折叠（true = 默认展开）
-  ShowWordCount: true              # 显示字数
-  ShowFullTextinRSS: true          # RSS 输出全文而非摘要（订阅者体验更好）
-  ShowRssButtonInSectionTermList: true   # 标签页 / 分类页加 RSS 按钮
+  # mainSections 决定首页"最近文章"和搜索索引来源；这里只有 posts
+  mainSections:
+    - posts
 
-  # --- 首页样式 ---
-  # PaperMod 首页有两种模式：
-  #   1) profileMode：中心头像 + 简介 + 几个跳转按钮，类似 landing page
-  #   2) posts list（默认）：直接列出最新文章
-  # 我先开 profileMode 给你看效果。如果想改成列表式：把 enabled 改 false。
-  profileMode:
-    enabled: true
-    title: "Wang Sihan / 王思涵"
-    subtitle: |
-      UE 图形 / 渲染 / 引擎方向。Vulkan KHR 光线追踪项目；
-      正在源码级深挖 UE 反射 / GC / Gameplay 基础。
-      这里发技术性长文，节奏不快，但每篇尽量扛得住 3 层追问。
-    imageUrl: ""             # 头像地址（放 static/images/avatar.jpg 后填 "/images/avatar.jpg"）
-    imageWidth: 120
-    imageHeight: 120
-    imageTitle: avatar
-    buttons:
-      - name: 文章
-        url: /posts/
-      - name: 归档
-        url: /archives/
-      - name: 标签
-        url: /tags/
+  # 不显示带 image 的文章 cover 时的占位图
+  defaultBackgroundImage: ""
+  defaultFeaturedImage: ""
 
-  # 如果你想关掉 profileMode、改用 posts list 首页，把上面的 enabled 设 false，
-  # 然后启用下面这块（写在主页文章列表上方的简介条）：
-  # homeInfoParams:
-  #   Title: "👋 Hi, I'm Wang Sihan"
-  #   Content: 一两句自我介绍...
+  # 高亮的目录里 lineNos 是否单独的列（节省宽度时关掉）
+  highlightCurrentMenuArea: true
+  smartTOC: true                # 阅读时自动展开当前章节
+  smartTOCHideUnfocusedChildren: false
 
-  # --- 社交图标（左下角链接图标） ---
-  # PaperMod 内置 60+ 图标，name 字段必须是它支持的。完整列表见主题 wiki。
-  socialIcons:
-    - name: github
-      url: "https://github.com/FriendlyNeighborWang"
-    # - name: linkedin
-    #   url: "https://www.linkedin.com/in/<your-id>"
-    # - name: email
-    #   url: "mailto:you@domain.com"
-    # - name: rss
-    #   url: "/index.xml"
+  # --- 首页 ---
+  homepage:
+    layout: "custom"           # 使用我们写的 layouts/partials/home/custom.html (斜分割 hero)
+                               # 备选: profile / hero / page / background
+    homepageImage: ""          # 头像 / 主图（放 assets/img/ 后填路径）
+    showRecent: true
+    showRecentItems: 6
+    showMoreLink: true
+    showMoreLinkDest: "/posts/"
+    cardView: true             # 最近文章用卡片网格展示
+    cardViewScreenWidth: false # true = 卡片撑满屏宽；false = 限制最大宽度
+    layoutBackgroundBlur: false
 
-  # --- 搜索（基于 Fuse.js 客户端模糊搜索） ---
-  fuseOpts:
-    isCaseSensitive: false
-    shouldSort: true
-    location: 0
-    distance: 1000
-    threshold: 0.4           # 0 = 精确匹配，1 = 全模糊；0.4 是平衡值
-    minMatchCharLength: 0
-    keys: ["title", "permalink", "summary", "content"]
+  # --- 文章页（单篇） ---
+  article:
+    showDate: true
+    showViews: false           # 需要外接 Firebase 才能显示访问数；先关
+    showLikes: false
+    showDateOnlyInArticle: false
+    showDateUpdated: false
+    showAuthor: true
+    showHero: false            # 文章页顶部大图；先关，需要时打开
+    heroStyle: "basic"         # basic / big / background / thumbAndBackground
+    layoutBackgroundBlur: false
+    layoutBackgroundHeaderSpace: true
+    showBreadcrumbs: true
+    showDraftLabel: true
+    showEdit: false            # 暂关；GH repo 稳定后可开
+    showHeadingAnchors: true
+    showPagination: true
+    invertPagination: false    # false = 上一篇在左、下一篇在右
+    showReadingTime: true
+    showTableOfContents: true
+    showTaxonomies: true
+    showAuthorBottom: false
+    showWordCount: true
+    showSummary: false
+    showZenMode: false
+    sharingLinks: []           # 空 = 不显示分享按钮（可加 ["x", "linkedin", "facebook"] 等）
 
-  # --- 资源加载控制 ---
-  assets:
-    disableHLJS: true        # 不加载 highlight.js（用 Hugo 内置 chroma 即可）
-    disableFingerprinting: false  # CSS/JS 加 hash 后缀，部署后浏览器缓存能正确刷新
-    favicon: ""              # 后续放 static/favicon.ico 后填 "/favicon.ico"
-    apple_touch_icon: ""
+  # --- 列表页（如 /posts/、/tags/xxx/） ---
+  list:
+    showHero: false
+    heroStyle: "background"
+    showBreadcrumbs: false
+    showSummary: true
+    showViews: false
+    showLikes: false
+    showTableOfContents: false
+    showCards: true            # 关键：列表用卡片网格而非简单列表
+    orderByWeight: false
+    groupByYear: false         # 不按年份分组（卡片视图下分组会变丑）
+    cardView: true             # 同时设这两个保险（不同 Blowfish 版本字段名有差异）
+    cardViewScreenWidth: false
+    constrainItemsWidth: false
 
-  # --- 文章封面图全局默认 ---
-  # 单篇文章可在 front matter 用 cover: { image: "..." } 单独指定
-  cover:
-    hidden: false
-    hiddenInList: false      # 列表页是否隐藏封面
-    hiddenInSingle: false    # 文章页是否隐藏封面
-    responsiveImages: true
+  # --- 标签 / 分类聚合页 ---
+  taxonomy:
+    showTermCount: true
+    showHero: false
+    heroStyle: "background"
+    showBreadcrumbs: false
+    showViews: false
+    showLikes: false
+    showTableOfContents: false
+    cardView: false
 
-  # --- "在 GitHub 上编辑此页"链接 ---
-  # 让读者可以一键提 PR 修错别字。指向你的 content/ 目录在 GH 上的位置。
-  editPost:
-    URL: "https://github.com/FriendlyNeighborWang/FriendlyNeighborWang.github.io/edit/main/content"
-    Text: "在 GitHub 上编辑"
-    appendFilePath: true     # 自动拼上文件相对路径
+  # --- 单个标签 / 分类的文章列表 ---
+  term:
+    showHero: false
+    heroStyle: "background"
+    showBreadcrumbs: true
+    showViews: false
+    showLikes: false
+    showTableOfContents: true
+    groupByYear: true
+    cardView: true
+    cardViewScreenWidth: false
 
-  # --- 评论（giscus，后续启用） ---
-  # comments: true
-  # 启用后还要在 layouts/partials/comments.html 配 giscus repo 等参数；
-  # 等本地预览跑通、域名定下来再做这步。
+  # --- 页脚 ---
+  footer:
+    showCopyright: true
+    showThemeAttribution: true
+    showAppearanceSwitcher: false   # 不显示明暗切换
+    showScrollToTop: true
 
-  # --- 数学公式（KaTeX） ---
-  math: true                 # 仅是开关；要真渲染还需补 layouts/partials/extend_head.html
-                             # 引入 KaTeX 资源——等你写第一篇含公式的文时我再加。
+  # --- SEO / 元数据 ---
+  description: "Notes on UE engine internals, graphics, and rendering."
+  keywords:
+    - Unreal Engine
+    - Graphics
+    - Rendering
+    - Vulkan
+    - C++
+  author:
+    name: "Wang Sihan"
+    headline: "UE Graphics / Rendering / Engine"
+    bio: "Vulkan KHR ray tracing project under my belt; currently doing source-level deep dives into UE reflection / GC / Gameplay."
+    image: ""
+    links:
+      - github: "https://github.com/FriendlyNeighborWang"

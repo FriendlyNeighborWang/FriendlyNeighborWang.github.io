@@ -4,12 +4,10 @@ date: {{ .Date }}
 draft: true
 tags: []
 categories: []
+series: []
+summary: ""
 description: ""
-ShowToc: true
-TocOpen: false
-cover:
-  image: ""
-  alt: ""
-  caption: ""
-  relative: false
+showTableOfContents: true
+showHero: false
+heroStyle: "basic"
 ---

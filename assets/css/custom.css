@@ -1,0 +1,295 @@
+/* ============================================================================
+ * 自定义样式 · Blowfish + Terminal 视觉皮肤
+ * ============================================================================
+ * 此文件在 Blowfish 主题样式之后加载，所以这里写的规则会覆盖主题默认。
+ * 配色另在 assets/css/schemes/terminal-amber.css。
+ * ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+ * 字体定义 · Fira Code (locally hosted, 来源 panr/hugo-theme-terminal)
+ *   chrome / 标题 / 代码块的 Latin 字符走这套
+ * ---------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/FiraCode-Latin.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/FiraCode-LatinExt.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ----------------------------------------------------------------------------
+ * 字体定义 · MiSans（小米兰亭，self-hosted woff2）
+ *   - 仅对 CJK 字符生效（unicode-range 限制），Latin 不会被这套接管
+ *   - 仅 Regular(400) + Bold(700) 两档；Bold 用于 **加粗**
+ *   - 5MB+ 一档，但 unicode-range 让浏览器仅在页面含中文时才下载
+ * ---------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'MiSans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/MiSans-Regular.woff2") format('woff2');
+  /* CJK 标点 + CJK 基本汉字 + 全角 / 半角符号 */
+  unicode-range: U+3000-303F, U+4E00-9FFF, U+FF00-FFEF, U+3400-4DBF, U+2E80-2EFF;
+}
+@font-face {
+  font-family: 'MiSans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/MiSans-Bold.woff2") format('woff2');
+  unicode-range: U+3000-303F, U+4E00-9FFF, U+FF00-FFEF, U+3400-4DBF, U+2E80-2EFF;
+}
+
+/* ----------------------------------------------------------------------------
+ * 字体令牌 · 覆盖 Blowfish 默认 (Tailwind v4 token)
+ *   sans = 系统字体栈 (含中文 fallback) → 用于正文长文阅读
+ *   mono = Fira Code + 中文等宽 fallback → 用于 chrome (菜单/标题/卡片/代码/meta)
+ * ---------------------------------------------------------------------------- */
+:root {
+  /* Latin 走系统字体；CJK 走 MiSans（通过 unicode-range 自动分流） */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "MiSans",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans CJK SC", "Source Han Sans SC",
+    sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  /* Latin 走 Fira Code；CJK 在 mono 上下文（菜单/标题/代码块等）回退到系统等宽 CJK */
+  --font-mono:
+    "Fira Code",
+    "Sarasa Mono SC", "Sarasa Term SC",
+    Monaco, Consolas, "Cascadia Code", "Liberation Mono", "Courier New",
+    monospace;
+}
+
+/* ----------------------------------------------------------------------------
+ * Chrome 元素强制 mono
+ *   即菜单、标题、卡片标题、徽章、按钮、meta、代码——所有"框架性"内容
+ * ---------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6,
+header, nav, footer,
+.menu, .header,
+.card-title, .article-title, .article-subtitle,
+button, .button, .btn,
+.tag, .badge, .taxonomies a,
+time, .meta, .article-meta,
+code, kbd, samp, pre, .prose code, .prose pre {
+  font-family: var(--font-mono);
+}
+
+/* ----------------------------------------------------------------------------
+ * 单篇文章正文 sans（仅 .prose 内，长文阅读区）
+ * 主页 / 列表页 / 标签页 / 关于页都不带 .prose，所以仍走默认 mono
+ * ---------------------------------------------------------------------------- */
+.prose p, .prose ul, .prose ol, .prose blockquote, .prose li {
+  font-family: var(--font-sans);
+}
+
+/* 但 prose 内的 code/pre 仍然 mono */
+.prose code, .prose pre {
+  font-family: var(--font-mono);
+}
+
+/* ----------------------------------------------------------------------------
+ * Terminal 风味 · 微观细节
+ * ---------------------------------------------------------------------------- */
+
+/* 直角无圆角（Terminal 美学核心） */
+.rounded, .rounded-sm, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl,
+.rounded-full,
+button, .button, .btn,
+.tag, .badge,
+input, textarea, select,
+.card, article.post,
+img.rounded, .avatar {
+  border-radius: 0 !important;
+}
+
+/* 例外：保留主页 profile 头像的圆形（如果有） */
+.profile img, .author-image {
+  border-radius: 50% !important;
+}
+
+/* 卡片用虚线/点状边框（Terminal 风格） */
+article.card,
+.card,
+[class*="card"] {
+  border-style: dashed;
+  border-width: 1px;
+}
+
+/* 链接默认带下划线，强化文档感 */
+.prose a,
+article a:not(.btn):not(.button) {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* 选区高亮用主色（琥珀） */
+::selection {
+  background: rgb(var(--color-primary-500) / 0.4);
+  color: rgb(var(--color-neutral-50));
+}
+
+/* ============================================================================
+ * 主页 Hero · 斜分割黑/芥末黄（Hugoplate 风）
+ * ============================================================================
+ * 实现核心：mix-blend-mode: difference + 文字颜色用芥末黄。
+ *   - 芥末黄文字 OVER 芥末黄背景 = |F-B| = (0,0,0) = 黑色显示
+ *   - 芥末黄文字 OVER 黑色背景   = |F-B| = 芥末黄显示
+ * 视觉上文字跨过对角分割线时颜色"自动反色"，整段就是同一段文字。
+ *
+ * 为了让 mix-blend-mode 只在 hero 内生效，hero 必须是独立的 stacking context
+ * （isolation: isolate），否则 blend 会穿到 body 背景上去。
+ * ============================================================================ */
+.hero-split {
+  position: relative;
+  isolation: isolate;
+  /* 让 hero 突破父容器 max-width，撑满整个视口宽度 */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;                /* 居中 */
+  /* 115deg 斜线：从左下到右上的分割角度，左半芥末黄 / 右半黑 */
+  background: linear-gradient(
+    115deg,
+    rgb(var(--color-primary-500)) 0%,
+    rgb(var(--color-primary-500)) 50%,
+    rgb(var(--color-neutral-900)) 50%,
+    rgb(var(--color-neutral-900)) 100%
+  );
+}
+
+.hero-split-content {
+  /* 文字色 = 芥末黄；和 background 做 difference 混合时自动反色 */
+  color: rgb(var(--color-primary-500));
+  mix-blend-mode: difference;
+  text-align: center;                     /* 居中 */
+  padding: 4rem 2rem;
+  max-width: 56rem;
+}
+
+.hero-title {
+  font-family: var(--font-mono);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.hero-headline {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.hero-bio {
+  font-family: var(--font-mono);
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  line-height: 1.6;
+  margin: 0 auto 1.5rem;
+  max-width: 40rem;
+}
+.hero-bio p {
+  margin: 0.75rem 0;
+}
+
+.hero-links {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;                /* icon 居中 */
+  margin-top: 1rem;
+  font-size: 1.5rem;
+}
+.hero-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* hero 下面的 "Recent" 区块 */
+.recent-section {
+  margin-top: 3rem;
+}
+
+/* ============================================================================
+ * 文章页 TOC · 从右侧移到左侧（仅桌面端）
+ * ============================================================================
+ * Blowfish 的 single.html 把 TOC 容器设为 flex item，在 lg 断点用
+ * `lg:order-last` + `lg:ms-auto` 推到右侧。这里通过 :has() 定位 TOC 包裹层，
+ * 翻转 order 与 margin、把 padding 镜像到对侧。
+ *
+ * 选择器 `section.prose > div:has(.toc)` 比 Tailwind 的 .lg\:ms-auto 特异性更高
+ * (0,2,2 vs 0,1,0)，无需 !important。
+ * ============================================================================ */
+@media (min-width: 1024px) {
+  /* (1) TOC 包裹层从右翻到左 */
+  article > section.prose > div:has(.toc) {
+    order: -1;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0;
+    padding-inline-end: 2rem;
+  }
+
+  /* (2) TOC 内层 div 的虚线边框从左侧翻到右侧
+     原 Blowfish: border-s-1 在 TOC 内容左缘（TOC 在右时充当分隔线）
+     翻转后:     border 在 TOC 内容右缘，分隔 TOC 与正文 */
+  details.toc-right > div {
+    border-inline-start-width: 0 !important;
+    border-inline-end-width: 1px;
+    margin-inline-start: 0 !important;
+    padding-inline-start: 0 !important;
+    padding-inline-end: 1.25rem;
+  }
+
+  /* (3) TOC 外层 details: 清除 Blowfish 的负 margin（原本用来把 TOC 拉向页面右内侧） */
+  details.toc-right {
+    margin-inline-start: 0 !important;
+    padding-inline-start: 0 !important;
+  }
+
+  /* (4) 文章 header（breadcrumb / 标题 / meta / 标签 / 作者信息）居中 */
+  article > header {
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    text-align: center;
+  }
+  /* header 内的几个 flex/grid 容器（breadcrumb / 作者卡片）天然左对齐，
+     强制它们也居中 */
+  article > header nav,
+  article > header .flex,
+  article > header [class*="grid"] {
+    justify-content: center;
+  }
+}
+
+/* 滚动条改为暖色调 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--color-neutral-900));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-primary-700));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--color-primary-500));
+}

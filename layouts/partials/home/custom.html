@@ -1,0 +1,30 @@
+{{/*
+  Custom homepage layout · Diagonal split hero
+  ----------------------------------------------------------------------------
+  CSS 在 assets/css/custom.css 的 .hero-split 区段。
+  Blowfish 的 layouts/index.html 会自动把 homepage.layout = "custom" 路由到这里。
+*/}}
+
+{{ $name := .Site.Params.Author.name | default .Site.Title }}
+{{ $headline := .Site.Params.Author.headline }}
+
+<section class="hero-split">
+  <div class="hero-split-content">
+    <h1 class="hero-title">{{ $name }}</h1>
+    {{ with $headline }}
+      <h2 class="hero-headline">{{ . | markdownify }}</h2>
+    {{ end }}
+    {{ with .Content }}
+      <div class="hero-bio">{{ . }}</div>
+    {{ end }}
+    <div class="hero-links">
+      {{ partialCached "author-links.html" . }}
+    </div>
+  </div>
+</section>
+
+{{ if .Site.Params.homepage.showRecent | default false }}
+  <section class="recent-section">
+    {{ partial "recent-articles/main.html" . }}
+  </section>
+{{ end }}

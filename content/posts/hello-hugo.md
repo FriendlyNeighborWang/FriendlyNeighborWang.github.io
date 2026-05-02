@@ -1,24 +1,24 @@
 ---
-title: "Hello Hugo · 测试文"
+title: "Hello Hugo · Test Post"
 date: 2026-05-02T19:30:00+08:00
 draft: false
 tags: ["meta", "hugo"]
-categories: ["杂"]
-description: "建站第一篇，用来检验各种元素的渲染效果。"
-ShowToc: true
-TocOpen: true
+categories: ["misc"]
+summary: "First post after the site went up — a sandbox to verify rendering of common elements."
+description: "First post after the site went up — a sandbox to verify rendering of common elements."
+showTableOfContents: true
 ---
 
-> 这是建站后写的第一篇，专门用来确认代码块、引用、列表、链接、图片等元素都能正常渲染。看完没问题就可以删掉。
+> First post after the site went up. Used purely as a rendering sandbox: code blocks, blockquotes, lists, tables, links, images. Once everything looks right, this post can be deleted.
 
-## 二级标题
+## A second-level heading
 
-正文段落。这里是普通文字，**加粗**、*斜体*、`行内代码`、[超链接](https://gohugo.io) 都试一下。
+Plain paragraph. Inline elements: **bold**, *italic*, `inline code`, [a link](https://gohugo.io). Mixed CJK works too: 这一段中文用来验证字体回退。
 
-### 代码块
+### Code blocks
 
 ```cpp
-// C++ 代码块测试
+// C++ rendering check
 template <typename T>
 class TWeakObjectPtr {
 public:
@@ -34,41 +34,40 @@ private:
 ```
 
 ```bash
-# 命令行高亮测试
+# Shell rendering check
 hugo server -D --bind 0.0.0.0
 ```
 
-### 引用块
+### Blockquote
 
-> "楼可以改得不高，但不能在已经改好的地方千疮百孔。"
-> —— 自己
+> "It's fine to keep the building short — what's not fine is patching what's already finished into a mess."
 
-### 列表
+### Lists
 
-无序：
+Unordered:
 
-- 项目 A
-- 项目 B
-  - 嵌套
-  - 嵌套
-- 项目 C
+- Item A
+- Item B
+  - Nested
+  - Nested
+- Item C
 
-有序：
+Ordered:
 
-1. 第一步
-2. 第二步
-3. 第三步
+1. First
+2. Second
+3. Third
 
-### 表格
+### Table
 
-| 项 | 值 | 说明 |
+| Item | Value | Notes |
 |---|---|---|
-| 框架 | Hugo | 单二进制，Go |
-| 主题 | PaperMod | tech blog 主流 |
-| 部署 | GH Pages + Actions | 推源码自动构建 |
+| Framework | Hugo | Single Go binary |
+| Theme | Blowfish | Card grid + Tailwind v4 |
+| Deploy | GH Pages + Actions | Source push triggers build |
 
-### 分隔线下面是结尾
+### Horizontal rule above the closer
 
 ---
 
-如果你看到上面所有元素都正常显示了，说明本地预览这一步通了。下一步是把站点推到 GitHub。
+If every element above renders correctly, the local sandbox check is done. Next: push to GitHub and verify production deploy.
