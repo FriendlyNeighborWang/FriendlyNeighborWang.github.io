@@ -141,7 +141,7 @@ void Node::initReflection(reflect::TypeDescriptor_Struct* typeDesc) {
 
 下面是Node的反射信息内存布局，可以作为参考：
 
-![image-20260503143634738](images\image-20260503143634738.png)
+![image-20260503143634738](images/image-20260503143634738.png)
 
 至此，我们基本了解了如何用C++实现一套基础的类型反射支持。我们大致总结一下为了支持反射需要做些什么：
 
@@ -1215,7 +1215,7 @@ void ConstructUClass(UClass*& OutClass, const FClassParams& Params)
 
 尽管我们把每个步骤做了些什么都标注到了其中，但是上述流程初看可能仍然有点复杂，不过我们可以把整个流程划分为两个重要阶段：构造UClass骨架 & 挂载内容。事实上，UE底层也是这么划分的。上面阶段A部分是UClass的框架构造，他会调用到下面这条函数链：
 
-![image-20260513174507604](images\image-20260513174507604.png)
+![image-20260513174507604](images/image-20260513174507604.png)
 
 该阶段结束之后，第二阶段会对UClass对象进行具体内容挂载，例如其中的UFunction、FProperty等。
 
