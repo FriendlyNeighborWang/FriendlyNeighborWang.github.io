@@ -168,14 +168,19 @@ article a:not(.btn):not(.button) {
   text-underline-offset: 0.2em;
 }
 
-/* 选区高亮用主色（琥珀） */
+/* 选区高亮：实色琥珀底 + 深色字（高亮笔效果），跟代码块统一。
+ * 早期用 0.4 alpha 半透明 + 浅字，碰到行内 <code>（本身有浅琥珀底）时
+ * 选区背景几乎跟原底色融在一起，只剩字色变化，不够明显。
+ * 改成实色之后，无论正文 / 行内代码 / 代码块都能清晰看见选区。 */
 ::selection {
-  background: rgb(var(--color-primary-500) / 0.4);
-  color: rgb(var(--color-neutral-50));
+  background: rgb(var(--color-primary-500));
+  color: rgb(var(--color-neutral-900));
+  text-shadow: none;
 }
 ::-moz-selection {
-  background: rgb(var(--color-primary-500) / 0.4);
-  color: rgb(var(--color-neutral-50));
+  background: rgb(var(--color-primary-500));
+  color: rgb(var(--color-neutral-900));
+  text-shadow: none;
 }
 
 /* ----------------------------------------------------------------------------
