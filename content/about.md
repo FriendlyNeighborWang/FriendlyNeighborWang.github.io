@@ -9,10 +9,11 @@ showAuthor: false
 showDate: false
 ---
 
-Wang Sihan, class of 2026, looking for a UE engine / graphics role.
+**Rendererer**
 
-- Vulkan KHR ray tracing project (ReSTIR DI, Cook-Torrance, custom memory management)
-- Currently source-level deep dive into UE reflection / GC / Gameplay basics
+Graphics / Vulkan / Unreal Engine
+
+学不会图形的图形人&没学过引擎的引擎岗&AI专业的背叛者；目前正在绝赞焦虑中
+
 - GitHub: [FriendlyNeighborWang](https://github.com/FriendlyNeighborWang)
 
-Long-form technical writing only, slow but designed to survive three layers of follow-up questions.

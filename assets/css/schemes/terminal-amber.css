@@ -27,8 +27,8 @@
   --color-neutral-500: 117, 107,  88;
   --color-neutral-600:  92,  82,  66;
   --color-neutral-700:  72,  63,  50;
-  --color-neutral-800:  58,  51,  38;   /* = #3a3326, body 背景色（提亮） */
-  --color-neutral-900:  30,  26,  18;   /* = #1e1a12, hero 黑半区 */
+  --color-neutral-800:  28,  25,  23;   /* = #1C1917, body 背景色 */
+  --color-neutral-900:  15,  14,  12;   /* 给主页 hero 用的更深的黑 */
 
   /* Primary · 提亮琥珀芥末（Vivid Amber，比原 Terminal 更鲜，去 olive 感） */
   --color-primary-50:  255, 251, 235;

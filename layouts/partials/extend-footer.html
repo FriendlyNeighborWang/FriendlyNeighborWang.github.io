@@ -1,0 +1,157 @@
+<!--
+  TOC 折叠交互（仅桌面端会真正显示按钮，CSS 控制 ≥1024px）。
+  - 把 .toc 内现有 details 们包进 .toc-content（只让内层做 transform 动画，
+    外层 .toc 不动，按钮挂在 .toc 上保持位置稳定）
+  - 在 .toc 末尾插一个浮窗按钮，点击切换 wrapper 的 .toc-collapsed 类
+  - 状态写到 localStorage（key: bf-toc-collapsed）
+  - 配合 extend-head 的 toc-init-collapsed 类做首屏防闪烁
+-->
+<script>
+  (function () {
+    'use strict';
+    var KEY = 'bf-toc-collapsed';
+
+    function init() {
+      var tocSticky = document.querySelector('article .toc');
+      if (!tocSticky) return;
+      var wrapper = tocSticky.parentElement;
+      if (!wrapper) return;
+
+      wrapper.id = 'toc-wrapper';
+      wrapper.classList.add('toc-toggleable');
+
+      // 先决定初始折叠状态（来自 <html> 防闪烁类）；先加 .no-transition
+      // 让首次同步状态不触发动画
+      var initCollapsed = document.documentElement.classList.contains('toc-init-collapsed');
+      if (initCollapsed) {
+        wrapper.classList.add('toc-collapsed', 'no-transition');
+      }
+
+      // 把 .toc 现有的 details 们移到一个新建的 .toc-content 内层，
+      // 后续动画只作用在 .toc-content 上
+      var content = document.createElement('div');
+      content.className = 'toc-content';
+      while (tocSticky.firstChild) {
+        content.appendChild(tocSticky.firstChild);
+      }
+      tocSticky.appendChild(content);
+
+      // 切换按钮：作为 .toc 的最后一个子节点（不在 .toc-content 内，所以不参与动画）
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toc-toggle-btn';
+      btn.setAttribute('aria-controls', 'toc-wrapper');
+      btn.setAttribute('aria-label', '切换目录');
+      btn.innerHTML = '<span class="toc-toggle-icon" aria-hidden="true">‹</span>';
+      tocSticky.appendChild(btn);
+
+      // 解除防闪烁类
+      document.documentElement.classList.remove('toc-init-collapsed');
+
+      function syncAria() {
+        var collapsed = wrapper.classList.contains('toc-collapsed');
+        btn.setAttribute('aria-expanded', String(!collapsed));
+      }
+      syncAria();
+
+      // 两帧后再放开 transition，避免初始同步状态闪一下动画
+      if (initCollapsed) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            wrapper.classList.remove('no-transition');
+          });
+        });
+      }
+
+      btn.addEventListener('click', function () {
+        var next = !wrapper.classList.contains('toc-collapsed');
+        wrapper.classList.toggle('toc-collapsed', next);
+        syncAria();
+        try { localStorage.setItem(KEY, next ? '1' : '0'); } catch (e) {}
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
+
+<!--
+  正文 prose 改写：
+    1. -> 渲染成 →
+    2. 文本里的 \t 换成 <span class="md-tab">（CSS 里给 4ch 宽度）
+  作用域：.article-content 内的文本节点；跳过 <code> / <pre> / .chroma 子树，
+  保留代码原样。浏览器默认 white-space: normal 会折叠 tab 到 1 空格，
+  Goldmark 标准 Typographer 也不含箭头替换，所以走客户端 DOM 改写。
+-->
+<script>
+  (function () {
+    function inCodeAncestor(node, root) {
+      var p = node.parentElement;
+      while (p && p !== root) {
+        var tag = p.tagName;
+        if (tag === 'CODE' || tag === 'PRE') return true;
+        if (p.classList && (p.classList.contains('chroma') || p.classList.contains('highlight-wrapper'))) {
+          return true;
+        }
+        p = p.parentElement;
+      }
+      return false;
+    }
+
+    function collectTextNodes(root, needleTest) {
+      var walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: function (node) {
+            if (!needleTest(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+            if (inCodeAncestor(node, root)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+      var nodes = [];
+      var n;
+      while ((n = walker.nextNode())) nodes.push(n);
+      return nodes;
+    }
+
+    function rewriteProse() {
+      var root = document.querySelector('.article-content');
+      if (!root) return;
+
+      // 1. -> → →
+      collectTextNodes(root, function (s) { return s.indexOf('->') !== -1; })
+        .forEach(function (n) {
+          n.nodeValue = n.nodeValue.replace(/->/g, '→');
+        });
+
+      // 2. \t → <span class="md-tab"></span>
+      //    文本节点拆成 [text, tab, text, tab, ...] 重新挂回 DOM
+      collectTextNodes(root, function (s) { return s.indexOf('\t') !== -1; })
+        .forEach(function (textNode) {
+          var parts = textNode.nodeValue.split('\t');
+          var fragment = document.createDocumentFragment();
+          parts.forEach(function (part, i) {
+            if (i > 0) {
+              var span = document.createElement('span');
+              span.className = 'md-tab';
+              fragment.appendChild(span);
+            }
+            if (part) fragment.appendChild(document.createTextNode(part));
+          });
+          textNode.parentNode.replaceChild(fragment, textNode);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', rewriteProse);
+    } else {
+      rewriteProse();
+    }
+  })();
+</script>

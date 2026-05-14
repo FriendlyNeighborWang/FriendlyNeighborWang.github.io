@@ -1,0 +1,13 @@
+<!--
+  防闪烁：在 <head> 里同步读取 localStorage，给 <html> 打上 toc-init-collapsed 类。
+  CSS 用这个类预设折叠态（无 transition），等 JS（extend-footer）接管后再移除。
+-->
+<script>
+  (function () {
+    try {
+      if (localStorage.getItem('bf-toc-collapsed') === '1') {
+        document.documentElement.classList.add('toc-init-collapsed');
+      }
+    } catch (e) {}
+  })();
+</script>

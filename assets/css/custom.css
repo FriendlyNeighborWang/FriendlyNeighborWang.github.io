@@ -101,6 +101,39 @@ code, kbd, samp, pre, .prose code, .prose pre {
 }
 
 /* ----------------------------------------------------------------------------
+ * 关掉代码场景里的 Fira Code 编程连字（calt + liga）
+ * ----------------------------------------------------------------------------
+ * Fira Code 默认会把 != → ≠、-> → →、|= → ⊨、>= → ≥ 等多字符运算符
+ * 渲染成单一符号；UI 文字里看着漂亮，但写在代码里会误导读者（! 和 ≠ 是
+ * 语义不同的事）。所以代码相关元素一律关掉连字，UI（标题、菜单、卡片
+ * 标题等）保留默认即可。
+ * ---------------------------------------------------------------------------- */
+code, kbd, samp, pre,
+.prose code, .prose pre,
+.highlight-wrapper, .highlight-wrapper *,
+.chroma, .chroma * {
+  font-variant-ligatures: none;
+  -webkit-font-feature-settings: "liga" 0, "calt" 0;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+/* Tab 字符在代码块里渲染成 4 字符宽（浏览器默认 8；Chroma 某些输出会被
+   压成更窄）。-moz-tab-size 给 Firefox 兜底。 */
+pre, .chroma, .chroma * {
+  tab-size: 4;
+  -moz-tab-size: 4;
+}
+
+/* 正文 prose 里的 \t —— extend-footer.html 的 JS 把每个 tab 文本换成
+   <span class="md-tab"></span>，这里给它一个固定 4ch 宽。
+   prose 容器默认 white-space: normal 会折叠原始 tab 到 1 空格，所以必须
+   走 JS 替换 + inline-block 占位的方式才能复刻"4 字符位"的视觉效果。 */
+.md-tab {
+  display: inline-block;
+  width: 4ch;
+}
+
+/* ----------------------------------------------------------------------------
  * Terminal 风味 · 微观细节
  * ---------------------------------------------------------------------------- */
 
@@ -139,6 +172,63 @@ article a:not(.btn):not(.button) {
 ::selection {
   background: rgb(var(--color-primary-500) / 0.4);
   color: rgb(var(--color-neutral-50));
+}
+::-moz-selection {
+  background: rgb(var(--color-primary-500) / 0.4);
+  color: rgb(var(--color-neutral-50));
+}
+
+/* ----------------------------------------------------------------------------
+ * 代码块选区高亮
+ * ----------------------------------------------------------------------------
+ * Chroma 高亮把每个 token 包成 <span color: ...>。全局 ::selection 在这种
+ * 子 span 上偶尔被压不显，且代码块深色底（#0d1117）需要更高对比度。
+ * 这里给 .chroma / pre / code 作用域内显式补一组 ::selection，并锁定
+ * user-select: text 防被祖先规则禁用。
+ * ---------------------------------------------------------------------------- */
+
+/* 显式开启选区（防御祖先 user-select: none） */
+.highlight-wrapper, .highlight-wrapper *,
+.chroma, .chroma *,
+pre, pre *,
+code {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* 行号沿用主题 user-select: none —— 选区不会包含行号 */
+.chroma .lnt,
+.chroma .ln,
+.chroma .lntable .lnt {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* 围栏式代码块（多行 ```）选区高亮：实色琥珀底 + 深色文字（高亮笔效果）
+ * 半透明在 chroma 深底（#0d1117）+ token 原色上会被压淡看不清，所以改成
+ * 实色背景；文字反色到 neutral-900，把语法高亮的各色 token 也强制压成
+ * 深色，跟琥珀底形成强对比。
+ *
+ * 作用域 ONLY 限于 .highlight-wrapper / .chroma / pre —— 这三者只对应
+ * Hugo 的围栏式代码块。Prose 里的行内 `code`（裸 <code>）不命中这里，
+ * 走全局 ::selection 的柔和效果即可。 */
+.highlight-wrapper ::selection,
+.chroma ::selection,
+.chroma::selection,
+pre ::selection,
+pre::selection {
+  background: rgb(var(--color-primary-500));
+  color: rgb(var(--color-neutral-900));
+  text-shadow: none;
+}
+.highlight-wrapper ::-moz-selection,
+.chroma ::-moz-selection,
+.chroma::-moz-selection,
+pre ::-moz-selection,
+pre::-moz-selection {
+  background: rgb(var(--color-primary-500));
+  color: rgb(var(--color-neutral-900));
+  text-shadow: none;
 }
 
 /* ============================================================================
@@ -238,13 +328,17 @@ article a:not(.btn):not(.button) {
  * (0,2,2 vs 0,1,0)，无需 !important。
  * ============================================================================ */
 @media (min-width: 1024px) {
-  /* (1) TOC 包裹层从右翻到左 */
+  /* (1) TOC 包裹层从右翻到左
+     用 margin-inline-end 而不是 padding-inline-end 制造间距：
+     padding 是 wrapper 内部的，浮窗按钮（absolute）会被 wrapper border-box
+     影响位置；margin 是外部的，按钮挂在 wrapper 右沿之后能稳定地落在 TOC
+     和正文之间的留白里。5rem 给按钮 + 正文之间 ~2rem 喘息。 */
   article > section.prose > div:has(.toc) {
     order: -1;
     margin-inline-start: 0;
-    margin-inline-end: 0;
+    margin-inline-end: 5rem;
     padding-inline-start: 0;
-    padding-inline-end: 2rem;
+    padding-inline-end: 0;
   }
 
   /* (2) TOC 内层 div 的虚线边框从左侧翻到右侧
@@ -277,6 +371,201 @@ article a:not(.btn):not(.button) {
   article > header [class*="grid"] {
     justify-content: center;
   }
+}
+
+/* ============================================================================
+ * 布局宽度 · 动态展开（dynamic line-length）
+ * ============================================================================
+ * Blowfish 默认 body 限 max-w-7xl (80rem / 1280px)，文章 max-w-prose (~65ch)，
+ * 在 1080p+ 屏上正文一栏只有 ~600px，旁边大块留白。
+ *
+ * 这里用 clamp() 让宽度跟随视口动态展开：
+ *   - 100% 缩放 / 默认窗口下，占比立刻提升（96vw 起步）
+ *   - 用户调浏览器缩放或拉宽窗口时，正文也跟着展开，无需手动断点
+ *   - 仍保留可读上限：body 100rem (1600px)，正文 100ch (~900-1000px)
+ *
+ * 同时收紧 lg+ 断点 8rem 的水平 padding，把腾出的横向空间还给内容。
+ * ============================================================================ */
+
+/* 1. body 外壳：移除 max-w-7xl 1280px 上限，clamp 跟随视口 */
+body {
+  max-width: clamp(20rem, 96vw, 100rem) !important;
+}
+
+/* 2. lg+ 断点 padding 从 8rem 收到 2.5rem，给内容更多横向空间 */
+@media (min-width: 1024px) {
+  body {
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+  }
+}
+
+/* 3. header / footer：clamp line-length，自身居中对齐 */
+article > header#single_header,
+article > footer.max-w-prose {
+  max-width: clamp(45ch, 72vw, 100ch) !important;
+  margin-inline: auto;
+}
+
+/* 4. 正文：用显式 width（不是 max-width）让外层 flex wrapper 能贴着收缩 */
+.article-content {
+  width: clamp(45ch, 72vw, 100ch);
+  max-width: 100% !important;
+}
+
+/* 5. 桌面端：把 TOC + 正文整体作为一个块在屏幕中心对齐
+ *    - section 改为 width: fit-content，自然收缩到 TOC+wrapper 的宽度
+ *    - margin-inline: auto 把整块居中
+ *    - wrapper 不再 flex-grow，回到 shrink-to-fit
+ *    没 TOC 的文章：section 只剩 wrapper，等价于正文单独居中 */
+@media (min-width: 1024px) {
+  article > section.prose {
+    width: fit-content !important;
+    max-width: 100%;
+    margin-inline: auto;
+  }
+  article > section.prose > div.min-w-0 {
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ============================================================================
+ * TOC 折叠交互（仅桌面端 ≥1024px）
+ * ============================================================================
+ * 移动端沿用 Blowfish 自带 details/summary 折叠，按钮 display: none。
+ *
+ * 桌面端：
+ *   - wrapper 的 max-width 从 18rem 收到 0，section（fit-content + margin auto）
+ *     自动重新居中，正文滑到屏幕正中
+ *   - .toc-content 用 overflow: hidden + opacity 0 在 wrapper 收缩时把 TOC 文字
+ *     裁掉淡出（wrapper 收到 0 之后 translate 无视觉意义，不再用）
+ *   - 单按钮跟随 .toc 右沿；wrapper 收到 0 后按钮自然落到 section 左缘，会跟
+ *     正文挤在一起，所以折叠态额外 translateX(-4rem) 把按钮推到 section 外，
+ *     和正文留 ~1rem 间距
+ *   - 状态保存在 localStorage（key: bf-toc-collapsed），跨页一致
+ *   - <html>.toc-init-collapsed 由 extend-head 内联脚本设置，做首屏防闪烁
+ * ============================================================================ */
+
+/* 默认隐藏，桌面端再开 */
+.toc-toggle-btn {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  /* wrapper：layout 收缩动画，让 section 重新居中 */
+  .toc-toggleable {
+    transition:
+      max-width 320ms cubic-bezier(0.4, 0, 0.2, 1),
+      margin-inline-end 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .toc-toggleable.toc-collapsed {
+    max-width: 0 !important;
+    margin-inline-end: 0 !important;
+  }
+
+  /* 内层 .toc-content：wrapper 收缩时配合 overflow:hidden 裁切 + opacity 淡出 */
+  .toc-toggleable .toc-content {
+    overflow: hidden;
+    transition: opacity 240ms ease;
+    will-change: opacity;
+  }
+  .toc-toggleable.toc-collapsed .toc-content {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* 首屏防闪烁：JS 接管前 .toc-content 还不存在，把整个 .toc 隐掉，
+     同时把 wrapper 也按折叠态收缩，避免首屏闪一下展开状态再收回去 */
+  html.toc-init-collapsed article > section.prose > div:has(.toc) {
+    max-width: 0 !important;
+    margin-inline-end: 0 !important;
+  }
+  html.toc-init-collapsed article > section.prose > div:has(.toc) > .toc {
+    visibility: hidden;
+  }
+
+  /* JS 初始化时短暂禁用所有 transition，避免初次同步状态闪一下动画 */
+  .toc-toggleable.no-transition,
+  .toc-toggleable.no-transition .toc-content,
+  .toc-toggleable.no-transition .toc-toggle-btn {
+    transition: none !important;
+  }
+
+  /* 浮窗切换按钮：四圆角小卡片 + 阴影，挂在 .toc 右沿外侧
+     .toc 在 lg 断点是 position: sticky（Blowfish 原生），自带定位上下文，
+     所以按钮跟着 .toc 一起做 sticky 滚动。
+     right: -3rem + width 2rem → 按钮整体在 wrapper 右沿外 1rem 起 */
+  .toc-toggle-btn {
+    display: flex;
+    position: absolute;
+    top: 0.25rem;
+    right: -3rem;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    background: rgb(var(--color-neutral-700));
+    border: 1px solid rgb(var(--color-neutral-600));
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    color: rgb(var(--color-primary-500));
+    cursor: pointer;
+    z-index: 20;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    transform: translate(0, 0);
+    transition:
+      background 200ms ease,
+      color 200ms ease,
+      transform 320ms cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 200ms ease;
+  }
+  .toc-toggle-btn:hover {
+    background: rgb(var(--color-neutral-600));
+    color: rgb(var(--color-primary-400));
+    transform: translate(0, -1px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  }
+  .toc-toggle-btn:focus-visible {
+    outline: 2px solid rgb(var(--color-primary-500));
+    outline-offset: 2px;
+  }
+  /* 折叠态：wrapper 收到 0 后按钮自然位置贴到 section 左缘，会和正文挤在
+     一起；额外 translateX(-6rem) 把它推到 section 外侧，留 ~3rem 间隙 */
+  .toc-toggleable.toc-collapsed .toc-toggle-btn {
+    transform: translate(-6rem, 0);
+  }
+  .toc-toggleable.toc-collapsed .toc-toggle-btn:hover {
+    transform: translate(-6rem, -1px);
+  }
+
+  /* 箭头：折叠时翻转 180° 指示反方向 */
+  .toc-toggle-icon {
+    display: inline-block;
+    transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .toc-toggleable.toc-collapsed .toc-toggle-icon {
+    transform: rotate(180deg);
+  }
+}
+
+/* ============================================================================
+ * Tags / Categories 聚合页：标签按自然宽度排，不换行
+ * ============================================================================
+ * Blowfish 的 terms.html 给每个 <article> 写死了 sm:w-1/2 md:w-1/3 lg:w-1/4
+ * 的等分宽度，长标签（比如 "Reflection"）超出 1/4 列宽时就拆开换行了。
+ * 这里改成 width: auto + 链接 white-space: nowrap，让每个标签按文字宽度
+ * 占位，超出一行自然换到下一行（flex-wrap 已经允许）。
+ * ============================================================================ */
+article.sm\:w-1\/2.md\:w-1\/3 {
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+article.sm\:w-1\/2.md\:w-1\/3 a {
+  white-space: nowrap;
 }
 
 /* 滚动条改为暖色调 */

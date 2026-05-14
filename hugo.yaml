@@ -10,8 +10,11 @@
 baseURL: "https://friendlyneighborwang.github.io/"
 defaultContentLanguage: "en"
 languageCode: "en"
-title: "Wang Sihan"
+title: "Rendererer"
 theme: "blowfish"
+# 让 Hugo 把每个 CJK 字符算作一个词，不再用空白切词（默认行为对中文会把
+# 一整段算成 1 个词，造成 .WordCount 偏小）
+hasCJKLanguage: true
 
 # ============================================================================
 # 构建行为
@@ -21,6 +24,14 @@ buildDrafts: false
 buildFuture: false
 buildExpired: false
 enableEmoji: true
+
+# 文章 .Date 字段的取值优先级：先用文件 mtime（编辑保存就更新），找不到再
+# 回落到 frontmatter 的 date 字段。模板里渲染 .Date 的地方就会显示最后修改
+# 时间，不需要每次手动改 frontmatter。
+frontmatter:
+  date:
+    - ":fileModTime"
+    - date
 enableInlineShortcodes: true
 
 pagination:
@@ -29,6 +40,12 @@ pagination:
 minify:
   disableXML: true
   minifyOutput: true
+  tdewolff:
+    html:
+      # 默认 minifier 会把文本里的 \t 压成单个空格，导致正文里的 tab 缩进
+      # 全部丢失。开 keepWhitespace 让 minifier 不动文本节点里的空白。
+      # extend-footer.html 的 JS 会负责把 \t 换成 4ch 宽的 <span class="md-tab">。
+      keepWhitespace: true
 
 # ============================================================================
 # 永久链接（让文章 URL 是 /posts/<slug> 形式，不带年月日，更清爽）
@@ -62,6 +79,7 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+      hardWraps: true   # 单个换行渲染成 <br>，支持 shift+enter 的软换行
   highlight:
     noClasses: false
     codeFences: true
@@ -69,7 +87,7 @@ markup:
     lineNos: false
     style: monokai
   tableOfContents:
-    startLevel: 2
+    startLevel: 1
     endLevel: 4
 
 # ============================================================================
@@ -139,7 +157,7 @@ params:
     showLikes: false
     showDateOnlyInArticle: false
     showDateUpdated: false
-    showAuthor: true
+    showAuthor: false          # 关掉文章头的 AUTHOR 卡片（名字 + bio）
     showHero: false            # 文章页顶部大图；先关，需要时打开
     heroStyle: "basic"         # basic / big / background / thumbAndBackground
     layoutBackgroundBlur: false
@@ -214,9 +232,10 @@ params:
     - Vulkan
     - C++
   author:
-    name: "Wang Sihan"
+    name: "Rendererer"
     headline: "UE Graphics / Rendering / Engine"
     bio: "Vulkan KHR ray tracing project under my belt; currently doing source-level deep dives into UE reflection / GC / Gameplay."
     image: ""
     links:
       - github: "https://github.com/FriendlyNeighborWang"
+      - zhihu: "https://www.zhihu.com/people/joker-97-19-55"

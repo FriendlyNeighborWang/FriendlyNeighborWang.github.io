@@ -1,8 +1,9 @@
 ---
-title: "Wang Sihan"
-description: "Notes on UE engine internals, graphics, and rendering."
+title: "Rendererer"
+description: "Notes on Unreal Engine internals, vulkan, and graphics."
 ---
 
-UE graphics / rendering / engine track. New grad job seeker, class of 2026. Vulkan KHR ray tracing project under my belt; currently doing source-level deep dives into UE's reflection / GC / Gameplay framework.
 
-Long technical posts here, slow cadence — but each one tries to hold up to three layers of follow-up questions.
+Tracks: Unreal Engine / Vulkan / Graphics;
+Research Interests: Real-time Rendering, Ray Tracing, and Parallel Computing;
+Currently diving into the source code.
