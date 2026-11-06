@@ -1,0 +1,7 @@
+{{ define "main" }}
+<div class="wrap narrow">
+  <p class="cmd"><span class="ps1">$</span> cat {{ "{{" }} request.path {{ "}}" }}</p>
+  <h1 class="page-title">404</h1>
+  <p class="dim">No such file or directory. <a href="{{ "/" | relURL }}">cd ~</a></p>
+</div>
+{{ end }}

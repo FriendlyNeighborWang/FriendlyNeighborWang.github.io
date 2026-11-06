@@ -1,0 +1,16 @@
+{{ $section := "" }}
+{{ with .Section }}{{ $section = . }}{{ end }}
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="{{ "/" | relURL }}">
+      <span class="brand-tilde">~/</span>{{ lower site.Title }}
+    </a>
+    <nav class="nav">
+      {{ range site.Menus.main }}
+        {{ $active := or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (eq .Identifier $section) }}
+        <a href="{{ .URL }}"{{ if $active }} class="active" aria-current="page"{{ end }}>{{ lower .Name }}</a>
+      {{ end }}
+      <button class="lamp" type="button" title="拖出光源切换明暗（或点击）"><span class="lamp-socket"></span><span class="lamp-orb"></span></button>
+    </nav>
+  </div>
+</header>

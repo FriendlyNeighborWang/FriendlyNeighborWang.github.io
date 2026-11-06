@@ -11,7 +11,7 @@ baseURL: "https://friendlyneighborwang.github.io/"
 defaultContentLanguage: "en"
 languageCode: "en"
 title: "Rendererer"
-theme: "blowfish"
+theme: "rendererer"   # 自写主题，见 themes/rendererer；旧主题 blowfish 仍保留在 themes/ 下
 # 让 Hugo 把每个 CJK 字符算作一个词，不再用空白切词（默认行为对中文会把
 # 一整段算成 1 个词，造成 .WordCount 偏小）
 hasCJKLanguage: true
@@ -80,6 +80,12 @@ markup:
     renderer:
       unsafe: true
       hardWraps: true   # 单个换行渲染成 <br>，支持 shift+enter 的软换行
+    extensions:
+      passthrough:      # 公式原样交给 KaTeX，文章里需加 {{< katex >}}
+        enable: true
+        delimiters:
+          block: [['\[', '\]'], ['$$', '$$']]
+          inline: [['\(', '\)'], ['$', '$']]
   highlight:
     noClasses: false
     codeFences: true
@@ -102,10 +108,6 @@ menu:
       name: Posts
       pageRef: posts
       weight: 10
-    - identifier: tags
-      name: Tags
-      pageRef: tags
-      weight: 20
     - identifier: about
       name: About
       pageRef: about

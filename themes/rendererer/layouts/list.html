@@ -1,0 +1,13 @@
+{{ define "main" }}
+<div class="wrap narrow">
+  <header class="page-head">
+    {{ partial "shards.html" . }}
+    <p class="cmd"><span class="ps1">$</span> ls {{ if eq .Kind "term" }}tags/{{ .Data.Term }}{{ else }}{{ .Section }}{{ end }}/ <span class="dim">· {{ len .Pages }} entries</span></p>
+    <h1 class="page-title">{{ if eq .Kind "term" }}#{{ .Title }}{{ else }}{{ .Title }}{{ end }}</h1>
+  </header>
+  {{ range .Pages.GroupByDate "2006" }}
+    <h2 class="year">{{ .Key }}</h2>
+    {{ partial "post-list.html" .Pages }}
+  {{ end }}
+</div>
+{{ end }}

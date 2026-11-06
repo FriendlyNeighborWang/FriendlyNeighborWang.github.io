@@ -1,0 +1,15 @@
+<ol class="post-list">
+  {{ range . }}
+  <li class="post-row">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+    <div class="post-row-body">
+      <a class="post-row-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+      {{ if .Draft }}<span class="badge">draft</span>{{ end }}
+      {{ with .Params.subtitle }}<div class="post-row-sub">{{ . }}</div>{{ end }}
+      {{ with .Params.tags }}
+      <div class="post-row-tags">{{ range . }}<span>#{{ . }}</span>{{ end }}</div>
+      {{ end }}
+    </div>
+  </li>
+  {{ end }}
+</ol>

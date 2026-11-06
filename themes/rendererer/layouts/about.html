@@ -1,0 +1,49 @@
+{{ define "main" }}
+{{- /* About as a man page: sections come from .Params.man (content/about.md). */ -}}
+{{- with .Params.man -}}
+<div class="wrap narrow">
+  <article class="man">
+    {{ partial "shards.html" $ }}
+    <p class="cmd"><span class="ps1">$</span> man {{ lower site.Title }}</p>
+    <header class="man-head" aria-hidden="true">
+      <span>{{ upper site.Title }}(1)</span><span>User Commands</span><span>{{ upper site.Title }}(1)</span>
+    </header>
+
+    <section class="man-sec">
+      <h2>NAME</h2>
+      <p><strong>{{ lower site.Title }}</strong> — {{ .name }}</p>
+    </section>
+
+    <section class="man-sec">
+      <h2>SYNOPSIS</h2>
+      <p class="man-synopsis">{{ .synopsis }}</p>
+    </section>
+
+    <section class="man-sec">
+      <h2>DESCRIPTION</h2>
+      <dl class="man-opts">
+        {{ range .description }}
+          <dt>{{ .flag }}</dt>
+          <dd>{{ .text }}</dd>
+        {{ end }}
+      </dl>
+    </section>
+
+    <section class="man-sec">
+      <h2>SEE ALSO</h2>
+      <ul class="man-see">
+        {{ range .seeAlso }}
+          <li><a href="{{ .url }}" rel="me noopener" target="_blank"><strong>{{ .name }}</strong>(1)</a><span>{{ .label }}</span></li>
+        {{ end }}
+      </ul>
+    </section>
+
+    <footer class="man-foot" aria-hidden="true">
+      <span>rendererer {{ now.Year }}</span><span>{{ upper site.Title }}(1)</span>
+    </footer>
+  </article>
+</div>
+{{- else -}}
+{{ partial "fallback-single.html" . }}
+{{- end -}}
+{{ end }}

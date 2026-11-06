@@ -1,0 +1,10 @@
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© {{ now.Year }} {{ site.Title }}</span>
+    <span class="footer-links">
+      {{ range site.Params.author.links }}{{ range $name, $url := . }}
+        <a href="{{ $url }}" rel="me noopener" target="_blank">{{ $name }}</a>
+      {{ end }}{{ end }}
+    </span>
+  </div>
+</footer>

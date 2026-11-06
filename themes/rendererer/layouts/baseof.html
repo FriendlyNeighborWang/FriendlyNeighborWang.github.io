@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="{{ site.Language.LanguageCode | default "zh-CN" }}">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body class="{{ .Kind }}{{ if and (eq .Kind "page") (in site.Params.mainSections .Section) }} is-post{{ end }}">
+  <div class="progress" aria-hidden="true"></div>
+  {{ partial "header.html" . }}
+  <main class="site-main">
+    {{ block "main" . }}{{ end }}
+  </main>
+  {{ partial "footer.html" . }}
+  <button class="ruler" type="button" title="回到顶部（gg）" aria-label="回到顶部"><span class="ruler-pos">Top</span><span class="ruler-gg" aria-hidden="true">gg</span></button>
+  {{ $js := slice (resources.Get "js/main.js") (resources.Get "js/lightbox.js") (resources.Get "js/lamp.js") (resources.Get "js/hang.js") (resources.Get "js/shards.js") | resources.Concat "js/site.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" defer></script>
+</body>
+</html>

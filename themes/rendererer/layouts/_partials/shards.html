@@ -1,0 +1,25 @@
+{{- /*
+  Shards floating over the page gutters, casting shadows from the lamp
+  (shards.js). Used on the home, list and standalone pages, never on posts.
+  Parent must be position: relative and horizontally centred in the viewport.
+
+  side l / r: gutter, f = 0..1 position across it from the outer edge;
+  y px relative to the parent top; w / hgt px; r rotation deg;
+  h height above the page px. Most of them sit near the lamp on the right,
+  low enough that each shadow reads as belonging to its shard.
+*/ -}}
+{{- $tri := "polygon(50% 0, 100% 100%, 0 100%)" -}}
+{{- $shards := slice
+  (dict "side" "r" "f" 0.45 "y" -95 "w" 30 "r" -18 "h" 60 "shape" $tri)
+  (dict "side" "r" "f" 0.68 "y" -25 "w" 14 "r" 40  "h" 40 "shape" $tri)
+  (dict "side" "r" "f" 0.38 "y" 125 "w" 46 "hgt" 18 "r" -10 "h" 50 "shape" "polygon(0 0, 100% 45%, 8% 100%)")
+  (dict "side" "l" "f" 0.55 "y" 15  "w" 36 "r" 22  "h" 30 "shape" $tri)
+  (dict "side" "l" "f" 0.40 "y" 150 "w" 15 "r" -35 "h" 22 "shape" $tri)
+-}}
+<div class="shards" aria-hidden="true">
+  {{- range $shards }}
+  {{- $style := printf "--f:%v;--y:%dpx;--w:%dpx;--shape:%s" .f .y .w .shape -}}
+  {{- with .hgt }}{{ $style = printf "%s;--hgt:%dpx" $style . }}{{ end }}
+  <span class="shard side-{{ .side }}" data-h="{{ .h }}" data-r="{{ .r }}" style="{{ $style | safeCSS }}"><i></i></span>
+  {{- end }}
+</div>

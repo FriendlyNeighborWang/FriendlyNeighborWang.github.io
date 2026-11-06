@@ -1,0 +1,39 @@
+{{- /*
+  Page-bundle images are re-encoded as WebP: a ≤1600px copy for the page,
+  and a full-resolution copy behind the click-through link.
+  Images under diagrams/ with a sibling <name>.dark.png (see tools/diagram_alpha.py)
+  are transparent figures: both variants are emitted and CSS shows the one that
+  matches the theme, on a gradient panel.
+*/ -}}
+{{- $u := urls.Parse .Destination -}}
+{{- $img := "" -}}
+{{- $dark := "" -}}
+{{- if not $u.IsAbs }}{{ with .PageInner.Resources.Get $u.Path }}{{ $img = . }}{{ end }}{{ end -}}
+{{- if and $img (strings.Contains $u.Path "diagrams/") -}}
+  {{- $dark = .PageInner.Resources.Get (replaceRE `\.png$` ".dark.png" $u.Path) -}}
+{{- end -}}
+{{- $alt := .PlainText -}}
+{{- if and $img (in (slice "png" "jpeg" "webp") $img.MediaType.SubType) -}}
+  {{- $variants := slice (dict "res" $img "class" (cond (not $dark) "" "only-light")) -}}
+  {{- with $dark }}{{ $variants = $variants | append (dict "res" . "class" "only-dark") }}{{ end -}}
+  {{- /* Inline images (i.e. inside comparison tables) keep full resolution for pixel peeping. */ -}}
+  {{- $fullRes := not .IsBlock -}}
+  {{- if $dark }}{{ $fullRes = false }}{{ end -}}
+  {{- $tags := "" -}}
+  {{- range $variants -}}
+    {{- $r := .res -}}
+    {{- $full := $r.Process (cond $fullRes "webp q95" "webp q90") -}}
+    {{- $show := $full -}}
+    {{- if not $fullRes }}{{ $show = cond (gt $r.Width 1600) ($r.Resize "1600x webp q85") ($r.Process "webp q88") }}{{ end -}}
+    {{- $tags = printf `%s<a class="img-link %s" href="%s"><img src="%s" width="%d" height="%d" alt="%s" loading="lazy" decoding="async"></a>` $tags .class $full.RelPermalink $show.RelPermalink $show.Width $show.Height $alt -}}
+  {{- end -}}
+  {{- if .IsBlock -}}
+    <figure class="figure{{ if $dark }} diagram{{ end }}">{{ $tags | safeHTML }}{{ with .Title }}<figcaption>{{ . }}</figcaption>{{ end }}</figure>
+  {{- else if $dark -}}
+    <span class="diagram diagram-inline">{{ $tags | safeHTML }}</span>
+  {{- else -}}
+    {{ $tags | safeHTML }}
+  {{- end -}}
+{{- else -}}
+  <img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy"{{ with .Title }} title="{{ . }}"{{ end }}>
+{{- end -}}

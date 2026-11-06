@@ -1,0 +1,24 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
+<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Params.subtitle }}{{ . }}{{ else }}{{ with .Summary }}{{ . | plainify | truncate 160 }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}{{ end }}">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="preload" href="/fonts/FiraCode-Latin.woff2" as="font" type="font/woff2" crossorigin>
+{{ $css := slice (resources.Get "css/main.css") (resources.Get "css/chroma.css") (resources.Get "css/chroma-light.css") | resources.Concat "css/site.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}">
+{{ with .OutputFormats.Get "rss" }}<link rel="alternate" type="application/rss+xml" href="{{ .RelPermalink }}" title="{{ site.Title }}">{{ end }}
+{{ if .HasShortcode "katex" }}
+  {{ $katexCSS := resources.Get "lib/katex/katex.min.css" | fingerprint }}
+  <link rel="stylesheet" href="{{ $katexCSS.RelPermalink }}">
+  {{ $katexJS := slice (resources.Get "lib/katex/katex.min.js") (resources.Get "lib/katex/auto-render.min.js") | resources.Concat "lib/katex/katex.bundle.js" | fingerprint }}
+  <script src="{{ $katexJS.RelPermalink }}" defer id="katex-lib"></script>
+  {{/* Publish the font files next to katex.min.css so its relative fonts/ urls resolve. */}}
+  {{ range resources.Match "lib/katex/fonts/*" }}{{ $_ := .RelPermalink }}{{ end }}
+{{ end }}

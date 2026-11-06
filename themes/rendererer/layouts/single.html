@@ -1,0 +1,51 @@
+{{ define "main" }}
+{{ $isPost := in site.Params.mainSections .Section }}
+{{ $toc := and $isPost (ne .Params.showTableOfContents false) (gt (len .Fragments.Headings) 0) }}
+<div class="wrap{{ if $toc }} with-toc{{ end }}">
+  <article class="article">
+    <header class="article-head">
+      {{ if not $isPost }}{{ partial "shards.html" . }}{{ end }}
+      {{ if $isPost }}<p class="path">~{{ .RelPermalink | strings.TrimSuffix "/" }}</p>{{ end }}
+      <h1 class="article-title">{{ .Title }}</h1>
+      {{ with .Params.subtitle }}<p class="article-subtitle">{{ . }}</p>{{ end }}
+      {{ if $isPost }}
+      <p class="meta">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+        <span>{{ .ReadingTime }} min</span>
+        <span>{{ lang.FormatNumber 0 .WordCount }} 字</span>
+        {{ if .Draft }}<span class="badge">draft</span>{{ end }}
+      </p>
+      {{ with .GetTerms "tags" }}
+      <p class="tags">{{ range . }}<a href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a>{{ end }}</p>
+      {{ end }}
+      {{ end }}
+    </header>
+
+    {{ if $toc }}
+    <details class="toc toc-inline">
+      <summary>目录</summary>
+      {{ .TableOfContents }}
+    </details>
+    {{ end }}
+
+    <div class="prose article-content">
+      {{ .Content }}
+    </div>
+
+    {{ if $isPost }}
+    <nav class="pager">
+      {{- /* PrevInSection is the older post, NextInSection the newer one. */}}
+      {{ with .PrevInSection }}<a class="pager-prev" href="{{ .RelPermalink }}"><span>← older</span>{{ .Title }}</a>{{ else }}<span></span>{{ end }}
+      {{ with .NextInSection }}<a class="pager-next" href="{{ .RelPermalink }}"><span>newer →</span>{{ .Title }}</a>{{ end }}
+    </nav>
+    {{ end }}
+  </article>
+
+  {{ if $toc }}
+  <aside class="toc toc-rail" aria-label="目录">
+    <p class="toc-label">contents</p>
+    {{ .TableOfContents }}
+  </aside>
+  {{ end }}
+</div>
+{{ end }}
